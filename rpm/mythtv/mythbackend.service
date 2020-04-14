@@ -38,8 +38,6 @@ Wants=httpd.service
 
 [Service]
 Type=simple
-Environment=MYTHCONFDIR=/etc/mythtv
-Environment=HOME=/usr/share/mythtv
 User=mythtv
 ExecStart=/usr/bin/mythbackend --logpath /var/log/mythtv/
 
