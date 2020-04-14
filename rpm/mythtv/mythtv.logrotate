@@ -9,7 +9,7 @@
         olddir /var/log/mythtv/old
         su mythtv mythtv
         lastaction
-                killall -HUP mythlogserver
+                killall -q -HUP mythlogserver
                 find /var/log/mythtv/old -type f -mtime +30 -delete
         endscript
 } 
