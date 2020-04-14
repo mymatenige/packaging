@@ -38,6 +38,8 @@ Wants=httpd.service
 [Service]
 Type=simple
 User=mythtv
+StandardError=null
+StandardOutput=null
 ExecStart=/usr/local/bin/mythbackend --logpath /srv/mythtv/logs
 
 [Install]
