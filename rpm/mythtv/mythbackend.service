@@ -37,10 +37,8 @@ Wants=httpd.service
 
 [Service]
 Type=simple
-Environment=MYTHCONFDIR=/etc/mythtv
-Environment=HOME=/usr/share/mythtv
 User=mythtv
-ExecStart=/usr/bin/mythbackend --logpath /var/log/mythtv/
+ExecStart=/usr/local/bin/mythbackend --logpath /srv/mythtv/logs
 
 [Install]
 WantedBy=multi-user.target
