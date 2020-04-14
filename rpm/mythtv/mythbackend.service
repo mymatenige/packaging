@@ -34,6 +34,7 @@ Description=MythTV backend service
 After=network.target mariadb.service
 # uncomment the following line if you will be using the mythweb plugin.
 #Wants=httpd.service
+Wants=httpd.service
 
 [Service]
 Type=simple
