@@ -40,7 +40,7 @@ Wants=httpd.service
 Type=simple
 User=mythtv
 StandardOutput=null
-ExecStart=/usr/bin/mythbackend --logpath /var/log/mythtv/
+ExecStart=/usr/local/bin/mythbackend --logpath /srv/mythtv/logs
 
 [Install]
 WantedBy=multi-user.target
