@@ -9,7 +9,7 @@
         olddir /srv/mythtv/logs/old
         su mythtv mythtv
         lastaction
-                killall -HUP mythlogserver
-                find /srv/mythtv/logs/old -type f -mtime +30 -delete
+                /usr/bin/killall -q -HUP mythlogserver
+                /usr/bin/find /srv/mythtv/logs/old -type f -mtime +30 -delete
         endscript
 } 
