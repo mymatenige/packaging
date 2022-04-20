@@ -40,7 +40,7 @@ Type=simple
 User=mythtv
 StandardError=null
 StandardOutput=null
-ExecStart=/usr/local/bin/mythbackend --logpath /srv/mythtv/logs
+ExecStart=/usr/local/bin/mythbackend --logpath /srv/data1/media/mythtv/logs
 
 [Install]
 WantedBy=multi-user.target
