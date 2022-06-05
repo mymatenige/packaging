@@ -31,16 +31,16 @@
 
 [Unit]
 Description=MythTV backend service
-After=network.target mysqld.service
+After=network.target mariadb.service
 # uncomment the following line if you will be using the mythweb plugin.
-#Wants=httpd.service
+Wants=httpd.service
 
 [Service]
 Type=simple
-Environment=MYTHCONFDIR=/etc/mythtv
-Environment=HOME=/usr/share/mythtv
 User=mythtv
-ExecStart=/usr/bin/mythbackend --logpath /var/log/mythtv/
+StandardError=null
+StandardOutput=null
+ExecStart=/usr/local/bin/mythbackend --logpath /srv/data1/media/mythtv/logs
 
 [Install]
 WantedBy=multi-user.target
