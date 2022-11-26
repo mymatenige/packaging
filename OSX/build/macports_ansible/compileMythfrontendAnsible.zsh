@@ -24,6 +24,7 @@ Standard options:
 Build Options
   --update-git=UPDATE_GIT                Update git repositories to latest (true)
   --skip-build=SKIP_BUILD                Skip configure and make - used when you just want to repackage (false)
+  --macports-clang=MP_CLANG              Flag to specify clang version to build with (default)
 Patch Options
   --apply-patches=APPLY_PATCHES          Apply patches specified in additional arguments (false)
   --mythtv-patch-dir=MYTHTV_PATCH_DIR    Directory containing patch files to be applied to Mythtv
@@ -41,16 +42,17 @@ EOF
 
 # setup default variables
 BUILD_PLUGINS=false
-PYTHON_VERS="38"
+PYTHON_VERS="310"
 UPDATE_PORTS=false
 MYTHTV_VERS="fixes/32"
 MYTHTV_PYTHON_SCRIPT="ttvdb4"
-DATABASE_VERS=mariadb-10.2
+DATABASE_VERS=mysql8
 QT_VERS=qt5
 GENERATE_APP=true
 GENERATE_DMG=false
 UPDATE_GIT=true
 SKIP_BUILD=false
+MP_CLANG=default
 SKIP_ANSIBLE=false
 APPLY_PATCHES=false
 MYTHTV_PATCH_DIR=""
@@ -80,6 +82,9 @@ for i in "$@"; do
       ;;
       --skip-ansible=*)
         SKIP_ANSIBLE="${i#*=}"
+      ;;
+      --macports-clang=*)
+        MP_CLANG="${i#*=}"
       ;;
       --version=*)
         MYTHTV_VERS="${i#*=}"
@@ -127,10 +132,10 @@ done
 # otherwise extract it from the MYTHTV_VERS
 case $MYTHTV_VERS in
     master*|*33*)
-       VERS=$(git ls-remote --tags  https://github.com/MythTV/mythtv.git|tail -n 1)
-       VERS=${VERS##*/v}
-       VERS=$(echo $VERS|tr -dc '0-9')
-       EXTRA_MYTHPLUGIN_FLAG=""
+      VERS=$(git ls-remote --tags  https://github.com/MythTV/mythtv.git|tail -n 1)
+      VERS=${VERS##*/v}
+      VERS=$(echo $VERS|tr -dc '0-9')
+      EXTRA_MYTHPLUGIN_FLAG=""
     ;;
     *32*|*31*)
       VERS=${MYTHTV_VERS: -2}
@@ -153,10 +158,26 @@ else
   RUNPREFIX=$INSTALL_DIR
 fi
 
+case $MP_CLANG in
+    clang-mp*)
+      CLANG_CMD=$PKGMGR_INST_PATH/bin/$MP_CLANG
+      CLANGPP_CMD=$PKGMGR_INST_PATH/bin/${MP_CLANG//clang/clang++}
+      # check is specified compiler is installed 
+      if ! [ -x "$(command -v $CLANG_CMD)" ]; then
+        CLANG_PORT=${MP_CLANG//clang-mp/clang}
+        sudo port -N install $CLANG_PORT
+      fi
+    ;;
+    *)
+      CLANG_CMD="clang"
+      CLANGPP_CMD="clang++"
+    ;;
+esac
+
 # Add some flags for the compiler to find the package manager locations
 export LDFLAGS="-L$PKGMGR_INST_PATH/libexec/$QT_VERS/lib -L$PKGMGR_INST_PATH/lib"
-export C_INCLUDE_PATH=$PKGMGR_INST_PATH/libexec/$QT_VERS/include/:$PKGMGR_INST_PATH/include:$PKGMGR_INST_PATH/include/libbluray
-export CPLUS_INCLUDE_PATH=$PKGMGR_INST_PATH/libexec/$QT_VERS/include/:$PKGMGR_INST_PATH/include:$PKGMGR_INST_PATH/include/libbluray
+export C_INCLUDE_PATH=$PKGMGR_INST_PATH/libexec/$QT_VERS/include/:$PKGMGR_INST_PATH/include:$PKGMGR_INST_PATH/include/libbluray:$PKGMGR_INST_PATH/include/libhdhomerun
+export CPLUS_INCLUDE_PATH=$PKGMGR_INST_PATH/libexec/$QT_VERS/include/:$PKGMGR_INST_PATH/include:$PKGMGR_INST_PATH/include/libbluray:$PKGMGR_INST_PATH/include/libhdhomerun
 export LIBRARY_PATH=$PKGMGR_INST_PATH/libexec/$QT_VERS/lib/:$PKGMGR_INST_PATH/lib
 
 # setup some paths to make the following commands easier to understand
@@ -438,8 +459,8 @@ else
               --runprefix=$RUNPREFIX \
               $ENABLE_MAC_BUNDLE \
               --qmake=$QMAKE_CMD \
-              --cc=clang \
-              --cxx=clang++ \
+              --cc=$CLANG_CMD \
+              --cxx=$CLANGPP_CMD \
               --disable-backend \
               --disable-distcc \
               --disable-lirc \
@@ -490,8 +511,8 @@ if $BUILD_PLUGINS; then
                 --runprefix=$RUNPREFIX \
                 --qmake=$QMAKE_CMD \
                 --qmakespecs=$QMAKE_SPECS \
-                --cc=clang \
-                --cxx=clang++ \
+                --cc=$CLANG_CMD \
+                --cxx=$CLANGPP_CMD \
                 --enable-mythgame \
                 --enable-mythmusic \
                 --enable-cdio \
@@ -624,15 +645,13 @@ $PY2APPLET_BIN -p $PYTHON_RUNTIME_PKGS --site-packages --use-pythonpath --make-s
 $PYTHON_BIN setup.py -q py2app 2>&1 > /dev/null
 # now we need to copy over the pythong app's pieces into the mythfrontend.app to get it working
 echo "    Copying in Python Framework libraries"
-cd $APP_DIR/PYTHON_APP/dist/$MYTHTV_PYTHON_SCRIPT.app
-cp -RHnp Contents/Frameworks/* $APP_FMWK_DIR
-
+mv -n $APP_DIR/PYTHON_APP/dist/$MYTHTV_PYTHON_SCRIPT.app/Contents/Frameworks/* $APP_FMWK_DIR
 echo "    Copying in Python Binary"
-cp -p Contents/MacOS/python $APP_EXE_DIR
+mv $APP_DIR/PYTHON_APP/dist/$MYTHTV_PYTHON_SCRIPT.app/Contents/MacOS/python $APP_EXE_DIR
 echo "    Copying in Python Resources"
-cp -RHnp Contents/Resources/* $APP_RSRC_DIR
-cd $APP_DIR
+mv -n $APP_DIR/PYTHON_APP/dist/$MYTHTV_PYTHON_SCRIPT.app/Contents/Resources/* $APP_RSRC_DIR
 # clean up temp application
+cd $APP_DIR
 rm -Rf PYTHON_APP
 
 echo "------------ Replace application perl/python paths to relative paths inside the application   ------------"
@@ -680,7 +699,7 @@ echo "------------ Searching Applicaition for missing libraries ------------"
 # Do one last sweep for missing dylibs in the Framework Directory
 for dylib in $APP_FMWK_DIR/*.dylib; do
   pathDepList=$(/usr/bin/otool -L $dylib|grep -e $PKGMGR_INST_PATH/lib -e $INSTALL_DIR)
-  if [ ! -z "${pathDepList// }" ] ; then
+  if [ ! -z $pathDepList ] ; then
     installLibs $dylib
   fi
 done
