@@ -31,7 +31,7 @@
 
 [Unit]
 Description=MythTV backend service
-After=network.target mariadb.service
+After=network.target mariadb.service systemd-udev-settle
 # uncomment the following line if you will be using the mythweb plugin.
 Wants=httpd.service
 
@@ -40,6 +40,7 @@ Type=simple
 User=mythtv
 StandardError=null
 StandardOutput=null
+ExecStartPre=-/usr/sbin/sudo /root/bin/create_dvb_adapter_symlinks.php
 ExecStart=/usr/local/bin/mythbackend --logpath /srv/data1/media/mythtv/logs
 
 [Install]
