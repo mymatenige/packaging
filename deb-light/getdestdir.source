@@ -6,6 +6,10 @@ if [[ -f $HOME/.buildrc ]] ; then
     . $HOME/.buildrc
 fi
 
+if [[ "$BUILD_METHOD" == '' ]] ; then
+    BUILD_METHOD=cmake
+fi
+
 if [[ "$BUILDDEST" == "" ]] ; then
     echo "Please supply destination for builds (default is $HOME/proj/build"
     read -e BUILDDEST
@@ -42,6 +46,10 @@ if [[ "$dirty" == 0 ]] ; then
     dirty=
 else
     dirty="-$BUILD_DIRTY"
+fi
+
+if [[ $BUILD_METHOD == cmake ]] ; then
+    dirty=
 fi
 
 longname="$chprefix$codename-$arch/$projname/$branch$dirty"
