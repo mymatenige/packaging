@@ -14,6 +14,10 @@ if [[ "$BUILD_PREPARE" != "" ]] ; then
     $BUILD_PREPARE
 fi
 
+if [[ "$BUILD_PRESET" == '' ]] ; then
+    BUILD_PRESET=qt5
+fi
+
 if [[ "$BUILD_METHOD" == '' ]]; then
     BUILD_METHOD=cmake
 fi
@@ -60,7 +64,7 @@ case $BUILD_METHOD in
     cmake)
         cd ..
         set -o pipefail
-        cmake --build build-qt5 |& tee -a $gitbasedir/../build_${projdir}.out || rc=$?
+        cmake --build build-$BUILD_PRESET |& tee -a $gitbasedir/../build_${projdir}.out || rc=$?
         set +o pipefail
         ;;
     make)
