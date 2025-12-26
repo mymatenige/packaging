@@ -31,8 +31,8 @@
 
 [Unit]
 Description=MythTV backend service
-Requires=mariadb.service
-After=network.target mariadb.service
+Requires=mariadb.service systemd-udev-settle.service
+After=network.target mariadb.service systemd-udev-settle.service
 # uncomment the following line if you will be using the mythweb plugin.
 Wants=httpd.service
 
