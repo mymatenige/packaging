@@ -38,7 +38,6 @@ MYTHTV_CONFIGURE_OPTS +=    --compile-type=$(MYTHTV_COMPILE_TYPE) \
 				--enable-firewire \
 				--enable-joystick-menu \
 				--with-bindings=perl \
-				--enable-ffmpeg-pthreads \
 				--enable-pic \
 				--perl-config-opts="INSTALLDIRS=vendor" \
 				--enable-libvpx \

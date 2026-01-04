@@ -921,8 +921,6 @@ cd mythtv
     --libdir=%{_libdir}                         \
     --libdir-name=%{_lib}                       \
     --mandir=%{_mandir}                         \
-    --enable-pthreads                           \
-    --enable-ffmpeg-pthreads                    \
     --enable-joystick-menu                      \
     --enable-audio-alsa                         \
     --enable-audio-oss                          \
