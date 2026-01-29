@@ -1,3 +1,9 @@
+mythtv (2:36.0+fixes) noble; urgency=medium
+
+  * Dummy entry to bump version to fixes/36
+
+ -- Roland Ernst <rcrernst@gmail.com>  Thu, 29 Jan 2026 21:08:26 +0100
+
 mythtv (2:36.0~master) noble; urgency=medium
 
   * Dummy entry to bump version to 36
