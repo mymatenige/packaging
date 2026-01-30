@@ -9,7 +9,7 @@ Standard Options:
   --help                                  Print this help message
   --version=MYTHTV_VERS                   Requested mythtv git repo (${1})
                                             Example: master for the latest master
-                                                     fixes/35 for version 35
+                                                     fixes/36 for version 36
   --build-plugins=BUILD_PLUGINS           Build MythTV Plugins (false)
 Environmental Options:
   --database-version=DATABASE_VERS        Requested version of mariadb/mysql to build agains (${3})
@@ -27,7 +27,7 @@ Configure and Build Options
   --update-git=UPDATE_GIT                 Update git repositories to latest (true)
                                             This is only used when the source has already been
                                             cloned via git and you do not want to pull any updates
-                                            from the master repo
+                                            from the selected repo
   --skip-ansible=SKIP_ANSIBLE             Skip ansible install (false)
                                             This avoids re-running ansible and should only be used
                                             if all packages have been correctly installed.
@@ -153,7 +153,7 @@ if [ -n "$GITHUB_ENV" ]; then
 fi
 ### Input Parsing ##################################################################################
 # setup default variables
-MYTHTV_VERS="master"
+MYTHTV_VERS="fixes/36"
 BUILD_PLUGINS=false
 BUNDLE_APPLICTION=false
 BUILD_FRONTEND_BUNDLE=OFF
