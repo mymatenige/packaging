@@ -1,4 +1,4 @@
-/var/log/mythtv/*.log {
+/srv/data1/media/mythtv/logs/*.log {
         weekly
         rotate 8
         missingok
@@ -6,9 +6,10 @@
         nocreate
         nocompress
         sharedscripts
-        olddir /var/log/mythtv/old
+        olddir /srv/data1/media/mythtv/logs/old
+        su mythtv mythtv
         lastaction
-                killall -HUP mythlogserver
-                find /var/log/mythtv/old -type f -mtime +30 -delete
+                /usr/bin/killall -q -HUP mythlogserver
+                /usr/bin/find /srv/data1/media/mythtv/logs/old -type f -mtime +30 -delete
         endscript
 } 
