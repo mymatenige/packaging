@@ -59,9 +59,18 @@ if [[ `arch` == arm* ]] ; then
     numjobs=2
 fi
 
+
 rc=0
 case $BUILD_METHOD in
     cmake)
+        # This will get projname and destdir
+        . "$scriptpath/getdestdir.source"
+        # For cmake we build in the same mythtv directory, not a mythplugis directory
+        destdir=`echo $destdir|sed s/mythplugins/mythtv/`
+        if [[ $projname == mythtv && -d $destdir/usr/lib/mythtv/plugins ]]; then
+            echo "This build already contains plugins. Rerun config or run from mythplugins directory"
+            exit 2
+        fi
         cd ..
         set -o pipefail
         cmake --build build-$BUILD_PRESET |& tee -a $gitbasedir/../build_${projdir}.out || rc=$?

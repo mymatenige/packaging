@@ -34,6 +34,10 @@ gitbasedir=`git rev-parse --show-toplevel`
 
 # This will get projname and destdir
 . "$scriptpath/getdestdir.source"
+if [[ $BUILD_METHOD == cmake ]] ; then
+    # For cmake we build in the same mythtv directory, not a mythplugis directory
+    destdir=`echo $destdir|sed s/mythplugins/mythtv/`
+fi
 
 gitpath="$PWD"
 
@@ -58,9 +62,10 @@ fi
 if [[ "$branch" == '(no' ]] ; then
     branch=detached
 fi
+mythdir=`echo $sourcedir|sed s/mythplugins/mythtv/`
 # example of packagever 30-Pre-545-g51d6fdf
-packagever=`env LD_LIBRARY_PATH=$sourcedir/usr/lib $sourcedir/usr/bin/mythutil --version |grep "MythTV Version"|cut -d ' ' -f 4|cut -c2-`
-packagebranch=`env LD_LIBRARY_PATH=$sourcedir/usr/lib $sourcedir/usr/bin/mythutil --version |grep "MythTV Branch"|cut -d ' ' -f 4`
+packagever=`env LD_LIBRARY_PATH=$mythdir/usr/lib $mythdir/usr/bin/mythutil --version |grep "MythTV Version"|cut -d ' ' -f 4|cut -c2-`
+packagebranch=`env LD_LIBRARY_PATH=$mythdir/usr/lib $mythdir/usr/bin/mythutil --version |grep "MythTV Branch"|cut -d ' ' -f 4`
 echo Package branch: $packagebranch, git branch: $gitbranch
 if [[ "$packagever" != "$gitver" && "$packagever" != "$gitver"-dirty ]] ; then
     echo ERROR Package version $packagever does not match git version $gitver
@@ -200,6 +205,7 @@ FINISH
             exit 2
         fi
         rm -rf $installdir/$packagename $installdir/$packagename.deb
+        sourcedir=`echo $sourcedir|sed s/mythplugins/mythtv/`
         cp -a "$sourcedir/" "$installdir/$packagename/"
 
         # Remove files not needed for package

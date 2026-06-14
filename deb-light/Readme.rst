@@ -24,8 +24,6 @@ make vs cmake
 MythTV historically was built using a Makefile in the mythtv and mythplugins
 directories. There is now a cmake option, which will be preferred in future.
 The deb-light build process caters for both methods and defaults to cmake.
-Note the cmake option has not been tested on Raspberry Pi, so if you
-encounter problems, use the make option.
 
 Setup for building
 ------------------
@@ -134,9 +132,12 @@ normal options.
 Before running config on mythplugins make sure you have already run
 config build and install on mythtv because the plugins need that.
 
-config on mythplugins clears out mythtv build data as well as mythplugins
-build data. It also makes a copy of the mythtv install to run the build
-against.
+When using make, config on mythplugins clears out mythtv build data as
+well as mythplugins build data. It also makes a copy of the mythtv
+install to run the build against.
+
+With cmake, the build is run into the same directory as the mythtv build.
+There is no longer a separate build directory for mythplugins.
 
 build.sh
 --------
@@ -207,7 +208,7 @@ named as $HOME/.mythtv-<shortname>, for example $HOME/.mythtv-mdm. This
 will contain details of your test database for that version.
 
 Patched versions have "-tst" in their directory name and I add a t to the
-shortname::
+shortname. This only applies to make builds, it does not work with cmake::
 
   shortname=mdmt longname=xenial-amd64/mythtv/master-tst
 
@@ -219,11 +220,11 @@ you can create the one as a link to the other::
 You can create multiple short names for the same version to test different
 scenarios::
 
-  shortname=mdmt longname=xenial-amd64/mythtv/master-tst
-  shortname=mdmt1 longname=xenial-amd64/mythtv/master-tst
+  shortname=mdm longname=xenial-amd64/mythtv/master
+  shortname=mdm1 longname=xenial-amd64/mythtv/master
 
-Then create $HOME/.mythtv-mdmt1 directory as a copy of $HOME/.mythtv-mdmt.
-Edit $HOME/.mythtv-mdmt1/config.xml and insert a LocalHostName that is different
+Then create $HOME/.mythtv-mdm1 directory as a copy of $HOME/.mythtv-mdm.
+Edit $HOME/.mythtv-mdm1/config.xml and insert a LocalHostName that is different
 from your system id::
 
   <LocalHostName>test1</LocalHostName>
@@ -231,6 +232,6 @@ from your system id::
 By running as follows you can have two setups, such as different themes,
 screen settings or playback profiles::
 
-  test.sh mdmt mythfrontend
-  test.sh mdmt1 mythfrontend
+  test.sh mdm mythfrontend
+  test.sh mdm1 mythfrontend
 

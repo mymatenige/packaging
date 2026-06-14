@@ -90,21 +90,20 @@ case $projname in
         fi
         ;;
     mythplugins)
-        git clean -Xfd
         if which $BUILD_PREPARE ; then
             $BUILD_PREPARE
         fi
         case $BUILD_METHOD in
             cmake)
                 . "$scriptpath/getdestdir.source"
+                # For cmake we build in the same mythtv directory, not a mythplugis directory
+                destdir=`echo $destdir|sed s/mythplugins/mythtv/`
                 cd ..
-                rm -rf build-$BUILD_PRESET
-                rm -rf $destdir
                 set -o pipefail
                 set -x
                 cmake --preset $BUILD_PRESET \
                     -DMYTH_BUILD_PLUGINS=ON \
-                    -DCMAKE_BUILD_TYPE=BUILD_TYPE \
+                    -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
                     -DCMAKE_INSTALL_PREFIX=$destdir/usr \
                     -DMYTH_RUN_PREFIX=/usr \
                     $MYTHTV_CONFIG_OPT_EXTRA \
@@ -113,6 +112,7 @@ case $projname in
                 set +o pipefail
                 ;;
             make)
+                git clean -Xfd
                 # Reset the mythtv config because this overwrites it
                 rm -f $gitbasedir/../config_${projdir}.branch
                 . "$scriptpath/getdestdir.source"
